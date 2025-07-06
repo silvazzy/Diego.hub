@@ -1,24 +1,17 @@
---== Diegohub Mobile | Blox Fruits (Delta Ready Script) ==--
-
-if not (game.PlaceId == 2753915549 or game.PlaceId == 4442272183 or game.PlaceId == 7449423635) then
-    return
-end
+if not (game.PlaceId == 2753915549 or game.PlaceId == 4442272183 or game.PlaceId == 7449423635) then return end
 
 local Players = game:GetService("Players")
 local RS = game:GetService("ReplicatedStorage")
 local TweenSvc = game:GetService("TweenService")
-
 local player = Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
 local hrp = char:WaitForChild("HumanoidRootPart")
-
 local Enemies = workspace:FindFirstChild("Enemies")
 local Bosses = workspace:FindFirstChild("Bosses")
 local CommF = RS:FindFirstChild("CommF_")
-
-if not Enemies then error("[Diegohub] 'Enemies' não encontrado") end
-if not Bosses then error("[Diegohub] 'Bosses' não encontrado") end
-if not CommF then error("[Diegohub] 'CommF_' não encontrado") end
+if not Enemies then return end
+if not Bosses then return end
+if not CommF then return end
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "DiegohubGUI"
@@ -38,12 +31,7 @@ layout.SortOrder = Enum.SortOrder.LayoutOrder
 local toggles = {}
 
 local function safeInvoke(...)
-    local ok, err = pcall(function()
-        CommF:InvokeServer(...)
-    end)
-    if not ok then
-        print("[Diegohub] Erro InvokeServer:", err)
-    end
+    local ok, err = pcall(function() CommF:InvokeServer(...) end)
 end
 
 local function safeTP(cf)
@@ -58,16 +46,11 @@ local function CreateBtn(text, onClick)
     btn.Font = Enum.Font.SourceSansBold
     btn.TextSize = 18
     btn.Text = text
-    btn.MouseButton1Click:Connect(function()
-        onClick(btn)
-    end)
+    btn.MouseButton1Click:Connect(function() onClick(btn) end)
     btn.LayoutOrder = table.getn(frame:GetChildren())
     return btn
 end
 
------- Botões ------
-
--- Auto Farm
 CreateBtn("Auto Farm: Off", function(btn)
     toggles.farm = not toggles.farm
     btn.Text = "Auto Farm: " .. (toggles.farm and "On" or "Off")
@@ -75,8 +58,7 @@ CreateBtn("Auto Farm: Off", function(btn)
         spawn(function()
             while toggles.farm do
                 for _, mob in ipairs(Enemies:GetChildren()) do
-                    if mob:FindFirstChild("Humanoid") and mob.Humanoid.Health > 0
-                       and mob:FindFirstChild("HumanoidRootPart") then
+                    if mob:FindFirstChild("Humanoid") and mob.Humanoid.Health > 0 and mob:FindFirstChild("HumanoidRootPart") then
                         safeTP(mob.HumanoidRootPart.CFrame * CFrame.new(0,5,0))
                         safeInvoke("Attack", "Normal")
                         task.wait(0.2)
@@ -88,7 +70,6 @@ CreateBtn("Auto Farm: Off", function(btn)
     end
 end)
 
--- Auto Boss
 CreateBtn("Auto Boss: Off", function(btn)
     toggles.boss = not toggles.boss
     btn.Text = "Auto Boss: " .. (toggles.boss and "On" or "Off")
@@ -98,8 +79,7 @@ CreateBtn("Auto Boss: Off", function(btn)
             while toggles.boss do
                 for _, name in ipairs(bossNames) do
                     local b = Bosses:FindFirstChild(name)
-                    if b and b:FindFirstChild("HumanoidRootPart") and b:FindFirstChild("Humanoid")
-                       and b.Humanoid.Health > 0 then
+                    if b and b:FindFirstChild("HumanoidRootPart") and b:FindFirstChild("Humanoid") and b.Humanoid.Health > 0 then
                         safeTP(b.HumanoidRootPart.CFrame * CFrame.new(0,5,0))
                         safeInvoke("Attack", "Normal")
                         task.wait(0.5)
@@ -111,7 +91,6 @@ CreateBtn("Auto Boss: Off", function(btn)
     end
 end)
 
--- Auto Quest
 CreateBtn("Auto Quest: Off", function(btn)
     toggles.quest = not toggles.quest
     btn.Text = "Auto Quest: " .. (toggles.quest and "On" or "Off")
@@ -129,16 +108,13 @@ CreateBtn("Auto Quest: Off", function(btn)
     end
 end)
 
--- Fruit Sniper
 CreateBtn("Fruit Sniper: Off", function(btn)
     toggles.sniper = not toggles.sniper
     btn.Text = "Fruit Sniper: " .. (toggles.sniper and "On" or "Off")
     if toggles.sniper then
         spawn(function()
             while toggles.sniper do
-                local ok, fruits = pcall(function()
-                    return CommF:InvokeServer("GetFruits")
-                end)
+                local ok, fruits = pcall(function() return CommF:InvokeServer("GetFruits") end)
                 if ok and type(fruits) == "table" then
                     for _, fn in ipairs(fruits) do
                         local f = workspace:FindFirstChild(fn)
@@ -153,5 +129,3 @@ CreateBtn("Fruit Sniper: Off", function(btn)
         end)
     end
 end)
-
-print("[Diegohub] Script carregado com sucesso.")
